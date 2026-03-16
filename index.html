@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>你在西方经典文学中是谁</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      max-width: 720px;
+      margin: 40px auto;
+      padding: 20px;
+      line-height: 1.6;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    .question-box {
+      border: 1px solid #ccc;
+      border-radius: 12px;
+      padding: 24px;
+      margin-top: 24px;
+    }
+
+    .progress {
+      color: #666;
+      margin-bottom: 12px;
+    }
+
+    .question-text {
+      font-size: 20px;
+      margin-bottom: 24px;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      padding: 12px 18px;
+      font-size: 16px;
+      border: 1px solid #999;
+      border-radius: 8px;
+      background: white;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #f0f0f0;
+    }
+
+    .result {
+      margin-top: 32px;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 12px;
+      background: #fafafa;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>你在西方经典文学中是谁</h1>
+
+  <div id="quiz" class="question-box">
+    <div id="progress" class="progress"></div>
+    <div id="question" class="question-text"></div>
+    <div class="buttons">
+      <button onclick="answerQuestion(1)">1</button>
+      <button onclick="answerQuestion(2)">2</button>
+      <button onclick="answerQuestion(3)">3</button>
+      <button onclick="answerQuestion(4)">4</button>
+      <button onclick="answerQuestion(5)">5</button>
+    </div>
+  </div>
+
+  <div id="result" class="result hidden"></div>
+
+  <script>
+    // 这里先放几道示例题
+    // dim 表示这题属于哪个维度
+    // reverse: true 表示反向题
+    const questions = [
+      {
+        text: "如果通过赞美或奉承一个我内心鄙视的权贵，能让我获得我本来梦寐以求的地位，我会毫不犹豫地去做。",
+        dim: "H",
+        reverse: true
+      },
+      {
+        text: "如果我发现了一个法律或契约上的漏洞，能让我不费吹灰之力就占有本属于大众的财富，我认为那是我的聪明才智应得的。",
+        dim: "H",
+        reverse: true
+      },
+      {
+        text: "我非常渴望拥有那种可以凌驾于普通人之上的丰裕生活，即便这种生活需要建立在他人的平庸之上或者是贫穷之上。",
+        dim: "H",
+        reverse: true
+      },
+      {
+        text: "我发自内心地认为，像我这样拥有才华或远见的人，理应比那些平庸的大众享有更多的特权和豁免权。",
+        dim: "H",
+        reverse: true
+      },
+      {
+        text: "当不可抗拒的灾厄（如战争、瘟疫或神谕的审判）降临时，我内心深处最先涌现的是一种难以名状的战栗，而非立刻构思理性的脱身之策。",
+        dim: "E",
+        reverse: false
+      },
+      {
+        text: "在灵魂最黑暗、最孤立无援的时刻，我渴望找到一个可以分担与倾诉痛苦的人（无论是爱人、知己还是神明），否则我的精神世界会有彻底崩塌的风险。",
+        dim: "E",
+        reverse: false
+      },
+      {
+        text: "我时常觉得，世界上的每一道裂痕都在我心中产生回响；陌生人的苦难、一段哀婉的旋律，都能轻易刺穿我的盔甲，让我陷入持久的感伤中。",
+        dim: "E",
+        reverse: false
+      },
+      {
+        text: "面对哪怕是极其微小的失败或他人的质疑，我的内心也会像被风暴肆虐的湖面一样，沉溺在焦虑与自我怀疑中。",
+        dim: "E",
+        reverse: false
+      },
+      {
+        text: "在众目睽睽之下，我能自然地感到自己是配得上这掌声与关注的；我不习惯于在人群中自我放逐，也不觉得众人的瞩目是一种负担。",
+        dim: "X",
+        reverse: false
+      },
+      {
+        text: "当我需要说服一群持有异见、甚至心怀恶意的人时，比起书信或私下的策略，我更倾向于直接步入圆心，用我的语言和气场去压制并主导整个局面。",
+        dim: "X",
+        reverse: false
+      },
+      {
+        text: "我渴望置身于那种充满生命律动的人潮之中，人群的欢笑和话语的喧嚣对我而言是精神的燃料，而非精力的消耗。",
+        dim: "X",
+        reverse: false
+      },
+      {
+        text: "我天生拥有一种“发热”的能力，即便身处低迷的时代、灰暗的境遇，我的生命频率也是高亢、乐观、具有感染力的，我很少让自己陷入那种寂静、低迷且长久的沉思状态。",
+        dim: "X",
+        reverse: false
+      },
+      {
+        text: "对于曾经伤害或羞辱过我的人，即便他们表现出悔意，我依然很难放下敌意或报复的念头，也无法再重建或修复往日的关系。",
+        dim: "A",
+        reverse: true
+      },
+      {
+        text: "当看到那些由于自身的愚蠢或贪婪而陷入困境的人时，我很难产生同情，反而觉得他们理应承受这些后果，我也不认为施加怜悯对自食其果之人有好处。",
+        dim: "A",
+        reverse: true
+      },
+      {
+        text: "在非原则性的争执中，为了维持某种体面或和谐，我愿意主动修正我的观点，哪怕我内心依然认为自己才是对的。",
+        dim: "A",
+        reverse: false
+      },
+      {
+        text: "当身边的人表现得低效、固执、迟钝，我内心的愤怒会像风暴一样迅速升起，并很难掩饰住内心的不满并耐心地引导他们。",
+        dim: "A",
+        reverse: true
+      },
+      {
+        text: "我习惯于为万事万物建立秩序。相比于随兴而至的自由，我更依赖于一种结构分明、逻辑清晰的框架（如清单、准则或严密的思维导图）来应对混乱的世界。",
+        dim: "C",
+        reverse: false
+      },
+      {
+        text: "为了达成一个预设的目标，我可以像推石上山的西绪福斯一样，忍受漫长且枯燥的重复劳作，且在此期间，新鲜的诱惑很难动摇我的专注。",
+        dim: "C",
+        reverse: false
+      },
+      {
+        text: "我是一个严苛的自我审判者。即便是微不足道的瑕疵或逻辑上的细小裂缝，也会让我感到如鲠在喉；在达到我内心的理想标准之前，我绝不容许任务宣告终结。",
+        dim: "C",
+        reverse: false
+      },
+      {
+        text: "我极其警惕那些突如其来的直觉或冒险的冲动。在付诸行动前，我习惯于反复推敲每个可能的变量与风险，宁愿因为过于谨慎而行动迟缓，也不愿在盲目中蹈死。",
+        dim: "C",
+        reverse: false
+      },
+      {
+        text: "当我面对壮丽的荒原、高妙的艺术品或是深邃的旋律，我常常会感到一种灵魂震颤的快感。",
+        dim: "O",
+        reverse: false
+      },
+      {
+        text: "我常常沉溺于宏大的幻想或哲学思辨中，甚至觉得精神的世界、思想的乐园与虚构的国度比现实更为真实。",
+        dim: "O",
+        reverse: false
+      },
+      {
+        text: "比起结论清楚、意义单一的事物，我更容易被暧昧、复杂、需要反复琢磨的作品或观念吸引。",
+        dim: "O",
+        reverse: false
+      },
+      {
+        text: "我认为所谓的“传统道德”和“社会惯例”只是一层脆弱的薄纱。真正的智者理应拥有超越时代的自由意志，即便这意味着会被庸常的大众视为异端或疯子。",
+        dim: "O",
+        reverse: false
+      }
+    ];
+
+    let currentQuestion = 0;
+
+    // 六维初始分数
+    const scores = {
+      H: 0,
+      E: 0,
+      X: 0,
+      A: 0,
+      C: 0,
+      O: 0
+    };
+
+    const prototypes = {
+      "奥德修斯": [4, 8, 16, 12, 20, 20],
+      "安提戈涅": [20, 16, 8, 4, 16, 12],
+      "梅什金": [20, 16, 4, 20, 12, 12],
+      "麦克白夫人": [4, 8, 16, 4, 20, 12],
+      "浮士德": [12, 12, 16, 12, 8, 20],
+      "堂吉诃德": [16, 20, 16, 12, 4, 20],
+      "海丝特": [16, 8, 4, 16, 20, 12],
+      "福尔摩斯": [12, 4, 8, 4, 20, 20],
+      "伊丽莎白": [16, 12, 20, 16, 12, 16],
+      "希斯克利夫": [8, 20, 12, 4, 12, 8],
+      "盖茨比": [4, 20, 20, 12, 12, 12],
+      "维特": [16, 20, 4, 12, 4, 20],
+      "科黛利娅": [20, 4, 4, 12, 20, 4],
+      "梅菲斯特": [4, 4, 12, 4, 16, 20],
+      "道连·格雷": [4, 12, 12, 8, 4, 20]
+    };
+
+
+function showQuestion() {
+  const q = questions[currentQuestion];
+  document.getElementById("progress").innerText =
+    `第 ${currentQuestion + 1} 题 / 共 ${questions.length} 题`;
+  document.getElementById("question").innerText = q.text;
+}
+
+function answerQuestion(value) {
+  const q = questions[currentQuestion];
+
+  // 反向题计分：1->5, 2->4, 3->3, 4->2, 5->1
+  let finalValue = q.reverse ? 6 - value : value;
+
+  // 把分数加到对应维度
+  scores[q.dim] += finalValue;
+
+  currentQuestion++;
+
+  if (currentQuestion < questions.length) {
+    showQuestion();
+  } else {
+    showResult();
+  }
+}
+
+function manhattanDistance(userScoresArray, prototypeArray) {
+  let total = 0;
+  for (let i = 0; i < userScoresArray.length; i++) {
+    total += Math.abs(userScoresArray[i] - prototypeArray[i]);
+  }
+  return total;
+}
+
+function calculateTypes() {
+  const userScoresArray = [
+    scores.H,
+    scores.E,
+    scores.X,
+    scores.A,
+    scores.C,
+    scores.O
+  ];
+
+  const results = Object.entries(prototypes).map(([name, prototypeArray]) => {
+    return {
+      name: name,
+      distance: manhattanDistance(userScoresArray, prototypeArray)
+    };
+  });
+
+  results.sort((a, b) => a.distance - b.distance);
+
+  return {
+    mainType: results[0],
+    subType: results[1]
+  };
+}
+
+function showResult() {
+  document.getElementById("quiz").classList.add("hidden");
+
+  const resultDiv = document.getElementById("result");
+  resultDiv.classList.remove("hidden");
+
+  const typeResults = calculateTypes();
+
+  resultDiv.innerHTML = `
+    <h2>测试完成</h2>
+    <p><strong>主型：</strong>${typeResults.mainType.name}</p>
+    <p><strong>副型：</strong>${typeResults.subType.name}</p>
+  `;
+}
+
+showQuestion();
+  </script>
+</body>
+</html>
