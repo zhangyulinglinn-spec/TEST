@@ -53,6 +53,13 @@
       background: #f0f0f0;
     }
 
+    .scale-hint {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 18px;
+      line-height: 1.5;
+    }
+    
     .result {
       margin-top: 32px;
       padding: 20px;
@@ -73,17 +80,22 @@
 <body>
   <h1>你在西方经典文学中是谁</h1>
 
-  <div id="quiz" class="question-box">
-    <div id="progress" class="progress"></div>
-    <div id="question" class="question-text"></div>
-    <div class="buttons">
-      <button onclick="answerQuestion(1)">1</button>
-      <button onclick="answerQuestion(2)">2</button>
-      <button onclick="answerQuestion(3)">3</button>
-      <button onclick="answerQuestion(4)">4</button>
-      <button onclick="answerQuestion(5)">5</button>
-    </div>
+<div id="quiz" class="question-box">
+  <div id="progress" class="progress"></div>
+  <div id="question" class="question-text"></div>
+
+  <div class="scale-hint">
+    1 = 非常不同意　2 = 不同意　3 = 一般　4 = 同意　5 = 非常同意
   </div>
+
+  <div class="buttons">
+    <button onclick="answerQuestion(1)">1</button>
+    <button onclick="answerQuestion(2)">2</button>
+    <button onclick="answerQuestion(3)">3</button>
+    <button onclick="answerQuestion(4)">4</button>
+    <button onclick="answerQuestion(5)">5</button>
+  </div>
+</div>
 
   <div id="result" class="result hidden"></div>
 
