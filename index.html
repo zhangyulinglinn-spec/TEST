@@ -422,16 +422,22 @@ function calculateTypes() {
     scores.O
   ];
 
-const results = Object.entries(prototypes).map(([name, prototypeArray]) => {
-  const distance = manhattanDistance(userScoresArray, prototypeArray);
-  const similarity = Math.round((1 - distance / 96) * 100);
+  const R = 24;
 
-  return {
-    name: name,
-    distance: distance,
-    similarity: similarity
-  };
-});
+  const results = Object.entries(prototypes).map(([name, prototypeArray]) => {
+    const distance = manhattanDistance(userScoresArray, prototypeArray);
+
+    const similarity = Math.max(
+      0,
+      Math.round(100 * (1 - distance / R))
+    );
+
+    return {
+      name: name,
+      distance: distance,
+      similarity: similarity
+    };
+  });
 
   results.sort((a, b) => a.distance - b.distance);
 
@@ -456,20 +462,20 @@ function showResult() {
   const subDesc = typeDescriptions[subName];
 
   resultDiv.innerHTML = `
-  <h2>测试完成</h2>
+    <h2>测试完成</h2>
 
-  <h3>主型：${mainName}</h3>
-  <p><strong>匹配度：</strong>${typeResults.mainType.similarity}%</p>
-  <p><strong>${mainDesc.title}</strong></p>
-  <p>${mainDesc.text}</p>
+    <h3>主型：${mainName}</h3>
+    <p><strong>匹配度：</strong>${typeResults.mainType.similarity}/100</p>
+    <p><strong>${mainDesc.title}</strong></p>
+    <p>${mainDesc.text}</p>
 
-  <hr>
+    <hr>
 
-  <h3>副型：${subName}</h3>
-  <p><strong>匹配度：</strong>${typeResults.subType.similarity}%</p>
-  <p><strong>${subDesc.title}</strong></p>
-  <p>${subDesc.text}</p>
-`;
+    <h3>副型：${subName}</h3>
+    <p><strong>匹配度：</strong>${typeResults.subType.similarity}/100</p>
+    <p><strong>${subDesc.title}</strong></p>
+    <p>${subDesc.text}</p>
+  `;
 }
 
 showQuestion();
